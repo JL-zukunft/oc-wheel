@@ -388,7 +388,8 @@ body::after {
   box-shadow: 2px 2px 0 #000;
 }
 .rc-close:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 #000; }
-.rc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-right: 44px; }
+#btn-result-close { position: static; }
+.rc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 .rc-head h2 {
   font-family: "Fusion Pixel", "PingFang SC", "Microsoft YaHei", monospace;
   font-size: 18px; color: var(--ink);
