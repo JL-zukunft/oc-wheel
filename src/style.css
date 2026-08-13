@@ -389,13 +389,14 @@ body::after {
 }
 .rc-close:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 #000; }
 #btn-result-close { position: static; }
-.rc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.rc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: nowrap; }
 .rc-head h2 {
   font-family: "Fusion Pixel", "PingFang SC", "Microsoft YaHei", monospace;
   font-size: 18px; color: var(--ink);
   text-shadow: none;
+  white-space: nowrap; flex-shrink: 0;
 }
-.rc-actions { display: flex; gap: 8px; align-items: center; }
+.rc-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; white-space: nowrap; }
 .ghost {
   font-family: "Fusion Pixel", "PingFang SC", "Microsoft YaHei", monospace;
   font-size: 14px; padding: 8px 14px;
