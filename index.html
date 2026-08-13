@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>绘题机 · 召唤今日OC</title>
+  <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+  <div id="backdrop"></div>
+
+  <div id="app">
+    <header class="top">
+      <h1>绘题机</h1>
+      <span class="sub">随机绘题 · 角色头像 · 单色主题</span>
+      <button id="btn-pool-top" class="sound" title="收藏池">⭐</button>
+      <button id="btn-sound" class="sound" title="音效开关">🔊</button>
+    </header>
+
+    <!-- 答案标签区（缩小保留） -->
+    <div id="chips" class="hidden"></div>
+
+    <!-- 召唤入口：扭蛋机投币口 -->
+    <div id="stage-start">
+      <div class="gacha-console" id="gacha-console">
+        <div class="coin-slot"><span class="coin"></span></div>
+        <button id="btn-summon">召唤今日OC</button>
+      </div>
+    </div>
+
+    <!-- 动画主舞台 -->
+    <main id="stage"></main>
+  </div>
+
+  <!-- 结果卡：弹出浮窗 -->
+  <div id="result-mask" class="hidden">
+    <div id="result-card">
+      <button id="btn-result-close" class="rc-close">✕</button>
+      <div class="rc-head">
+        <h2>今日 OC</h2>
+        <div class="rc-actions">
+          <button id="btn-pool" class="ghost">收藏池</button>
+          <button id="btn-fav" class="fav" title="收藏">♡</button>
+        </div>
+      </div>
+      <div id="result-list"></div>
+    </div>
+    <div class="rc-cta">快去画叭！</div>
+    <button id="btn-again" class="rc-again">再来一次</button>
+  </div>
+
+  <!-- 收藏池 -->
+  <div id="pool-mask" class="hidden">
+    <div id="pool-panel">
+      <button id="btn-pool-close" class="rc-close">✕</button>
+      <h3>收藏池</h3>
+      <ul id="pool-list"></ul>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden"></div>
+
+  <script src="src/data.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>

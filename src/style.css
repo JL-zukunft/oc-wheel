@@ -1,0 +1,523 @@
+@font-face {
+  font-family: 'Fusion Pixel';
+  src: url('assets/fusion-pixel.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #0d0d14;
+  --panel: #17171f;
+  --metal: linear-gradient(180deg, #2c2c38 0%, #15151c 100%);
+  --border: #3a3a48;
+  --text: #e8e6df;
+  --muted: #9a97a3;
+  --accent: #e8e6df;
+  --neon: #3ef2d0;
+  --pink: #ff5a9e;
+  --ink: #2f2f38;
+  --ink-muted: #7a7a86;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Fusion Pixel", "PingFang SC", "Microsoft YaHei", monospace;
+  background: linear-gradient(160deg, #fff7e6 0%, #ffe3ec 45%, #e8f4ff 100%);
+  color: var(--text);
+  min-height: 100vh;
+  image-rendering: pixelated;
+}
+
+/* 轻微 CRT 扫描线 */
+body::after {
+  content: ''; position: fixed; inset: 0; z-index: 50; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,.12) 0 1px, transparent 1px 3px);
+  opacity: .5;
+}
+
+#backdrop {
+  position: fixed; inset: 0; z-index: 0;
+  background: transparent;
+  transition: background .6s ease;
+}
+#backdrop.lit::after {
+  content: ''; position: absolute; inset: 0;
+  background: var(--light-overlay, transparent);
+  mix-blend-mode: overlay;
+}
+
+#app { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding: 26px 20px 64px; }
+
+.top { text-align: center; margin-bottom: 16px; position: relative; }
+.top h1 {
+  font-family: "Fusion Pixel", "PingFang SC", "Microsoft YaHei", monospace;
+  font-size: 30px; letter-spacing: 4px;
+  color: #2b2b33;
+  text-shadow: 2px 2px 0 rgba(255,255,255,.7), 0 0 14px rgba(255,120,160,.55), 0 0 30px rgba(62,242,208,.4);
+}
+.top .sub { display: block; margin-top: 12px; color: var(--ink-muted); font-size: 15px; letter-spacing: 2px; }
+.sound {
+  position: absolute; right: 0; top: 4px;
+  width: 34px; height: 34px; font-size: 16px;
+  border-radius: 0; border: 2px solid #000;
+  background: var(--metal); color: var(--text); cursor: pointer;
+  box-shadow: 2px 2px 0 #000;
+}
+.sound:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 #000; }
+
+.hidden { display: none !important; }
+
+/* 像素按钮通用 */
+.px-btn {
+  border: 2px solid #000; border-radius: 0;
+  box-shadow: 3px 3px 0 #000;
+  image-rendering: pixelated;
+}
+.px-btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #000; }
+
+/* ---- 投币口 + 召唤按钮 ---- */
+#stage-start { display: flex; justify-content: center; align-items: center; padding: 30px 0; min-height: 52vh; }
+.gacha-console { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.coin-slot {
+  width: 120px; height: 36px;
+  background: #08080c;
+  border: 3px solid #000;
+  border-radius: 0;
+  position: relative;
+  box-shadow: inset 0 2px 8px #000;
+}
+.coin-slot::after {
+  content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
+  width: 6px; transform: translateX(-50%); background: #000;
+}
+.coin {
+  position: absolute; left: 50%; top: -18px;
+  width: 24px; height: 24px; margin-left: -12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f6d77a, #c98a2a);
+  border: 2px solid #7a5a1a;
+  opacity: 0; transition: top .3s ease, opacity .3s ease;
+}
+.gacha-console.active .coin { top: 5px; opacity: 1; }
+#btn-summon {
+  font-family: "Fusion Pixel", "PingFang SC", "Microsoft YaHei", monospace;
+  font-size: 26px; letter-spacing: 4px; line-height: 1.6;
+  padding: 28px 60px;
+  border-radius: 0;
+  border: 3px solid #000;
+  cursor: pointer;
+  color: #1a1a14;
+  background: linear-gradient(135deg, #f6d77a, #e8a55a);
+  box-shadow: 4px 4px 0 #000, 0 0 20px rgba(232,165,90,.5);
+  transition: transform .1s ease, box-shadow .1s ease;
+}
+#btn-summon:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 #000, 0 0 28px rgba(232,165,90,.7); }
+#btn-summon:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 #000; }
+
+/* ---- chips ---- */
+#chips {
+  display: flex; flex-wrap: wrap; gap: 7px;
+  justify-content: center;
+  margin-bottom: 30px; min-height: 26px;
+}
+.chip {
+  font-size: 14px; line-height: 1.3;
+  padding: 5px 10px;
+  border-radius: 0;
+  border: 2px solid #000;
+  background: rgba(255,255,255,.88);
+  color: var(--ink);
+  box-shadow: 2px 2px 0 #000;
+  animation: chipIn .3s ease;
+  text-align: center;
+}
+@keyframes chipIn { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: scale(1); } }
+
+/* ---- 舞台 ---- */
+#stage { min-height: 360px; display: flex; align-items: center; justify-content: center; }
+.module { text-align: center; width: 100%; }
+.stage-title {
+  font-family: "Fusion Pixel", "PingFang SC", "Microsoft YaHei", monospace;
+  color: #2b2b33; font-size: 16px; letter-spacing: 3px; margin-bottom: 24px;
+  text-shadow: 2px 2px 0 rgba(255,255,255,.7), 0 0 12px rgba(255,120,160,.5);
+}
+.prelude-title { animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: .45; } 50% { opacity: 1; } }
+
+/* ---- 形象底子：球形玻璃摇号机 ---- */
+.machine { position: relative; display: flex; flex-direction: column; align-items: center; margin-bottom: 22px; }
+.sphere {
+  position: relative; width: 230px; height: 230px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 26%, rgba(255,255,255,.5), rgba(255,255,255,.12) 38%, rgba(30,34,48,.62) 78%, rgba(12,14,20,.8) 100%);
+  border: 3px solid rgba(255,255,255,.22);
+  box-shadow:
+    inset -18px -22px 50px rgba(0,0,0,.6),
+    inset 12px 14px 30px rgba(255,255,255,.18),
+    inset 0 -8px 22px rgba(120,180,255,.08),
+    0 18px 40px rgba(0,0,0,.6),
+    0 0 30px rgba(120,180,255,.15);
+  overflow: hidden;
+}
+.ring {
+  position: absolute; left: -6px; right: -6px; top: 50%;
+  height: 12px; transform: translateY(-50%);
+  background: linear-gradient(180deg, #7a7a8c 0%, #3a3a48 45%, #16161d 55%, #7a7a8c 100%);
+  box-shadow: 0 2px 6px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.25);
+  z-index: 0;
+}
+.sphere::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255,255,255,.55), rgba(255,255,255,.06) 20%, transparent 40%),
+    radial-gradient(ellipse at 50% 110%, rgba(120,180,255,.28), transparent 42%),
+    radial-gradient(circle at 50% 50%, transparent 58%, rgba(16,22,36,.42) 100%);
+  pointer-events: none;
+  z-index: 3;
+}
+.tube {
+  position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+  width: 36px; height: 20px;
+  background: var(--metal); border: 2px solid #000;
+  border-radius: 0; z-index: 2;
+}
+.stand { position: relative; width: 130px; height: 30px; background: var(--metal); border: 2px solid #000; border-radius: 0; margin-top: 8px; box-shadow: 3px 3px 0 #000; }
+.stand::before { content: ''; position: absolute; left: 10px; right: 10px; top: 50%; height: 4px; transform: translateY(-50%); background: repeating-linear-gradient(90deg, rgba(255,255,255,.18) 0 4px, transparent 4px 12px); border-radius: 2px; }
+.mb { position: absolute; border-radius: 50%; box-shadow: inset -2px -3px 4px rgba(0,0,0,.35), 1px 2px 4px rgba(0,0,0,.3); }
+.mb::after { content: ''; position: absolute; left: 24%; top: 20%; width: 28%; height: 28%; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.95), rgba(255,255,255,0)); }
+.face-balls { display: grid; grid-template-columns: repeat(7, max-content); justify-content: center; gap: 10px 14px; width: 100%; max-width: 880px; margin: 0 auto; }
+.machine-row { display: flex; align-items: center; justify-content: center; gap: 28px; margin-bottom: 22px; }
+.draw-panel { min-width: 150px; padding: 18px 16px; background: #fdf8ef; border: 3px solid #000; border-radius: 0; box-shadow: 4px 4px 0 #000; }
+.draw-text { font-family: "Fusion Pixel", "PingFang SC", "Microsoft YaHei", monospace; font-size: 15px; color: #e0452f; min-height: 22px; }
+.face-ball {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px;
+  border-radius: 0;
+  background: rgba(255,255,255,.88); border: 2px solid #000;
+  box-shadow: 3px 3px 0 #000;
+  animation: ballIn .4s cubic-bezier(.2,.9,.3,1.3);
+}
+.fb-main { display: flex; flex-direction: column; align-items: center; }
+.face-ball .fb-label { font-size: 13px; color: var(--ink-muted); }
+.face-ball .fb-value { font-size: 17px; margin-top: 3px; color: var(--ink); white-space: nowrap; }
+@keyframes ballIn { from { opacity: 0; transform: translateY(-30px) scale(.5); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+/* ---- 单色转盘（霓虹） ---- */
+.wheel-wrap { position: relative; width: 360px; height: 360px; }
+.wheel { width: 360px; height: 360px; will-change: transform; }
+.wheel-svg {
+  width: 100%; height: 100%;
+  filter: drop-shadow(0 0 14px rgba(62,242,208,.35)) drop-shadow(0 10px 30px rgba(0,0,0,.6));
+}
+.pointer {
+  position: absolute; top: -10px; left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 13px solid transparent; border-right: 13px solid transparent;
+  border-top: 22px solid #f6d77a;
+  filter: drop-shadow(0 0 8px rgba(246,215,122,.9));
+  z-index: 2;
+}
+.solar-layout { display: flex; align-items: center; justify-content: center; gap: 30px; }
+.group-lights { display: flex; flex-direction: column; gap: 16px; }
+.gl:nth-child(1) { --glc: #f6d77a; }
+.gl:nth-child(2) { --glc: #6fe3a5; }
+.gl:nth-child(3) { --glc: #6fb8f6; }
+.gl:nth-child(4) { --glc: #c08af6; }
+.gl {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  position: relative;
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.22), var(--glc) 58%, rgba(0,0,0,.45) 130%);
+  border: 2px solid #000;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,.6), 2px 2px 0 #000;
+  transition: background .12s ease, box-shadow .12s ease;
+}
+.gl::after {
+  content: ''; position: absolute; left: 26%; top: 20%;
+  width: 36%; height: 36%; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.85), rgba(255,255,255,0));
+}
+.gl-on {
+  background: radial-gradient(circle at 35% 30%, #fff, var(--glc) 58%, rgba(0,0,0,.35) 145%);
+  box-shadow: 0 0 18px var(--glc), 0 0 40px var(--glc), inset 0 -3px 6px rgba(0,0,0,.35);
+}
+.rc-colorband { display: grid; grid-template-columns: repeat(2, auto); gap: 6px 12px; margin-left: auto; margin-right: auto; flex: 0 0 auto; }
+.rc-swatch {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 8px; border-radius: 0; border: 2px solid #000;
+  background: rgba(255,255,255,.75); box-shadow: 2px 2px 0 #000;
+}
+.rc-swatch-color { width: 22px; height: 22px; border-radius: 0; border: 1px solid rgba(0,0,0,.3); flex: 0 0 auto; }
+.rc-swatch-name { font-size: 13px; color: var(--ink); }
+.rc-swatch-hex { font-size: 10px; color: var(--ink-muted); font-family: monospace; }
+.rc-cta {
+  font-family: "Fusion Pixel", "PingFang SC", "Microsoft YaHei", monospace;
+  font-size: 42px;
+  letter-spacing: 6px;
+  color: #ff5a9e;
+  text-shadow: 3px 3px 0 #000, 0 0 16px rgba(255,90,158,.85), 0 0 36px rgba(255,90,158,.5);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+.rc-again {
+  font-family: "Fusion Pixel", "PingFang SC", "Microsoft YaHei", monospace;
+  font-size: 20px; letter-spacing: 3px;
+  margin-left: auto; margin-right: auto;
+  margin-bottom: auto;
+  padding: 14px 36px;
+  border-radius: 0; border: 3px solid #000;
+  background: linear-gradient(135deg, #f6d77a, #e8a55a);
+  color: #141419;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #000;
+  transition: transform .1s ease, box-shadow .1s ease;
+}
+.rc-again:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 #000; }
+.rc-again:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 #000; }
+
+/* ---- 打光：拉杆老虎机 ---- */
+.lever-machine { display: flex; align-items: flex-end; justify-content: center; gap: 8px; }
+.lever {
+  width: 24px; height: 210px;
+  background: var(--metal);
+  border: 2px solid #000;
+  border-radius: 0;
+  position: relative;
+  z-index: 10;
+  transition: height .45s cubic-bezier(.2,.8,.3,1.3);
+  box-shadow: 3px 3px 0 #000;
+}
+.lever::before {
+  content: ''; position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+  width: 32px; height: 32px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff8a8a, #b01a1a);
+  border: 2px solid #000;
+  box-shadow: 0 0 12px rgba(255,90,90,.7);
+  transition: transform .45s cubic-bezier(.2,.8,.3,1.3);
+}
+.lever.pulled { height: 100px; }
+.lever.pulled::before { transform: translateX(-50%) scale(1.4); }
+.vslots { display: flex; gap: 10px; }
+.vslot {
+  width: 100px; height: 224px;
+  overflow: hidden;
+  border: 3px solid #000;
+  border-radius: 0;
+  background: linear-gradient(180deg, #0c0c12 0%, #1c1c26 100%);
+  position: relative;
+  box-shadow:
+    inset 0 8px 18px rgba(0,0,0,.9),
+    inset 0 -4px 10px rgba(0,0,0,.7),
+    inset 0 0 0 2px rgba(255,255,255,.06),
+    0 0 0 5px #2c2c38,
+    0 6px 14px rgba(0,0,0,.6);
+}
+.vslot::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0) 28%, transparent 68%, rgba(0,0,0,.16));
+}
+.vslot::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 50%;
+  height: 3px; background: var(--neon); opacity: .8;
+  box-shadow: 0 0 10px var(--neon);
+  transform: translateY(-50%);
+  z-index: 3;
+}
+.vslot-track { display: flex; flex-direction: column; align-items: center; will-change: transform; }
+.vslot-item {
+  height: 56px; display: flex; align-items: center; justify-content: center; gap: 6px;
+  font-size: 17px; color: var(--text);
+}
+.vslot-ico { font-size: 21px; }
+
+/* ---- 老虎机柜体 + 霓虹彩灯 ---- */
+.cabinet {
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  background: linear-gradient(180deg, #5a5a6e 0%, #2a2a35 22%, #17171d 50%, #2a2a35 78%, #5a5a6e 100%);
+  border: 3px solid #000;
+  border-radius: 0;
+  padding: 16px 16px 22px;
+  box-shadow: 10px 10px 0 #000, 0 28px 60px rgba(0,0,0,.6), inset 0 3px 10px rgba(255,255,255,.18), inset 0 -6px 14px rgba(0,0,0,.5);
+  transform: perspective(1100px) rotateX(3deg);
+}
+.neon-strip {
+  width: 100%; height: 12px;
+  border-radius: 0;
+  border: 2px solid #000;
+  background: repeating-linear-gradient(90deg, #ff5a9e 0 12px, #3ef2d0 12px 24px, #f6d77a 24px 36px, #7a5fb8 36px 48px);
+  animation: chase 0.9s linear infinite;
+  box-shadow: 0 0 18px rgba(255,90,158,.55);
+}
+@keyframes chase { from { background-position: 0 0; } to { background-position: 48px 0; } }
+
+/* ---- 结果卡：弹出浮窗 ---- */
+#result-mask {
+  position: fixed; inset: 0; z-index: 20;
+  background: rgba(0,0,0,.68);
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 14px;
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+#result-card {
+  --accent: #e8e6df;
+  width: min(460px, 92vw);
+  margin-top: auto;
+  max-height: 88vh; overflow-y: auto;
+  border: 3px solid var(--accent);
+  border-radius: 0;
+  padding: 24px;
+  position: relative;
+  background: #fdf8ef;
+  box-shadow: 0 0 30px rgba(0,0,0,.35), inset 0 0 0 1px rgba(0,0,0,.08);
+  transition: border-color .3s ease;
+}
+#result-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 90px;
+  background: linear-gradient(180deg, var(--accent), transparent);
+  opacity: .3;
+  pointer-events: none;
+}
+#result-card > *:not(.rc-close) { position: relative; z-index: 1; }
+.rc-close {
+  position: absolute; top: 12px; right: 12px; z-index: 2;
+  width: 30px; height: 30px;
+  border-radius: 0; border: 2px solid #000;
+  background: rgba(0,0,0,.08); color: var(--ink); cursor: pointer; font-size: 15px;
+  box-shadow: 2px 2px 0 #000;
+}
+.rc-close:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 #000; }
+.rc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-right: 44px; }
+.rc-head h2 {
+  font-family: "Fusion Pixel", "PingFang SC", "Microsoft YaHei", monospace;
+  font-size: 18px; color: var(--ink);
+  text-shadow: none;
+}
+.rc-actions { display: flex; gap: 8px; align-items: center; }
+.ghost {
+  font-family: "Fusion Pixel", "PingFang SC", "Microsoft YaHei", monospace;
+  font-size: 14px; padding: 8px 14px;
+  border-radius: 0;
+  border: 2px solid #000;
+  background: rgba(255,255,255,.6); color: var(--ink);
+  cursor: pointer; box-shadow: 2px 2px 0 #000;
+}
+.ghost:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 #000; }
+.fav {
+  font-size: 17px; width: 34px; height: 34px;
+  border-radius: 0;
+  border: 2px solid #000;
+  background: rgba(255,255,255,.6); color: var(--ink);
+  cursor: pointer; box-shadow: 2px 2px 0 #000;
+}
+.fav:hover { color: var(--pink); }
+.fav:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 #000; }
+.fav-on { color: #e0452f; }
+.fav-on:hover { color: #e0452f; }
+#btn-pool-top { position: absolute; right: 44px; top: 4px; }
+
+#result-list { display: flex; flex-direction: column; gap: 4px; }
+.rc-module {
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(0,0,0,.15);
+}
+.rc-module:last-child { border-bottom: none; }
+.rc-stack .rc-mlabel { flex-basis: 100%; }
+.rc-center { align-items: center; }
+.rc-solar-left { display: inline-flex; align-items: center; gap: 6px; flex: 0 0 auto; }
+.rc-mlabel { font-size: 16px; color: var(--ink-muted); flex: 0 0 auto; text-shadow: none; }
+.rc-chip {
+  font-family: "Fusion Pixel", "PingFang SC", "Microsoft YaHei", monospace;
+  font-size: 15px; padding: 4px 10px;
+  background: rgba(255,255,255,.78);
+  border: 2px solid #000;
+  border-radius: 0; color: var(--ink);
+  box-shadow: 2px 2px 0 #000;
+}
+
+/* ---- 待发展池 ---- */
+#pool-mask {
+  position: fixed; inset: 0; z-index: 20;
+  background: rgba(0,0,0,.68);
+  display: flex; align-items: center; justify-content: center;
+}
+#pool-panel {
+  position: relative;
+  width: min(540px, 92vw); max-height: 82vh;
+  background: var(--panel); border: 3px solid #000;
+  border-radius: 0; padding: 20px;
+  display: flex; flex-direction: column;
+  box-shadow: 6px 6px 0 #000;
+}
+#pool-panel h3 {
+  font-family: "Fusion Pixel", "PingFang SC", "Microsoft YaHei", monospace;
+  font-size: 15px; margin-bottom: 12px;
+}
+#pool-list { list-style: none; overflow-y: auto; flex: 1; }
+#pool-list li { padding: 10px; border-bottom: 1px solid var(--border); }
+#pool-list li.empty { color: var(--muted); text-align: center; padding: 30px; border: none; }
+.p-head { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); margin-bottom: 6px; }
+.p-del { background: transparent; border: none; color: var(--pink); cursor: pointer; font-size: 14px; }
+.p-sum { font-size: 16px; line-height: 1.6; }
+/* 收藏池关闭按钮复用 .rc-close 样式 */
+
+/* ---- toast ---- */
+#toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  background: var(--panel); border: 2px solid #000;
+  padding: 10px 20px; border-radius: 0; font-size: 16px;
+  box-shadow: 3px 3px 0 #000;
+  z-index: 30;
+}
+
+/* 亮色主题覆盖：弹窗 / 提示 */
+#toast, #pool-panel { background: #fdf8ef; border-color: #2b2b33; }
+#toast { color: var(--ink); }
+#pool-panel h3, #pool-list li, .p-sum { color: var(--ink); }
+.p-head, #pool-list li.empty { color: var(--ink-muted); }
+#btn-pool-close { color: var(--ink); }
+
+/* ---- 手机适配 ---- */
+@media (max-width: 640px) {
+  #app { padding: 16px 12px 64px; }
+  .top h1 { font-size: 22px; }
+
+  /* 召唤按钮 */
+  #stage-start { padding: 20px 0; min-height: 42vh; }
+  #btn-summon { font-size: 18px; letter-spacing: 3px; padding: 20px 34px; }
+
+  /* 拉杆老虎机：3 滚轮竖屏适配 */
+  .cabinet { padding: 14px 8px; }
+  .lever-machine { gap: 4px; }
+  .vslots { gap: 5px; }
+  .vslot { width: 76px; height: 160px; }
+  .vslot-item { height: 44px; font-size: 11px; }
+  .vslot-ico { font-size: 14px; }
+  .lever { width: 14px; height: 160px; }
+  .lever.pulled { height: 76px; }
+  .lever::before { width: 24px; height: 24px; top: -12px; }
+
+  /* 摇奖机：球仓与抽选屏竖排堆叠 */
+  .machine-row { flex-direction: column; gap: 16px; }
+  .sphere { width: 200px; height: 200px; }
+  .draw-panel { min-width: 0; width: 100%; }
+  .face-balls { grid-template-columns: repeat(3, max-content); gap: 8px 10px; }
+  .face-ball { padding: 6px 6px; gap: 6px; }
+  .fb-value { font-size: 13px; }
+
+  /* 单色转盘 */
+  .wheel-wrap, .wheel { width: 260px; height: 260px; }
+  .solar-layout { flex-direction: column; gap: 16px; }
+  .group-lights { flex-direction: row; }
+
+  /* 顶部答案标签 */
+  .chip { font-size: 13px; padding: 4px 8px; }
+
+  /* 结果卡 */
+  #result-card { padding: 16px; }
+  .rc-cta { font-size: 24px; letter-spacing: 3px; }
+  .rc-head { flex-direction: column; align-items: flex-start; gap: 10px; padding-right: 0; }
+  .rc-chip { font-size: 15px; }
+}

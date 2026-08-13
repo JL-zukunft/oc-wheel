@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OC转盘 · 召唤今日OC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+  <div id="backdrop"></div>
+
+  <div id="app">
+    <header class="top">
+      <h1>OC转盘</h1>
+      <span class="sub">随机形象 · 头像到胸上 · 单色 / 灰度</span>
+      <button id="btn-sound" class="sound" title="音效开关">🔊</button>
+    </header>
+
+    <!-- 答案标签区（缩小保留） -->
+    <div id="chips" class="hidden"></div>
+
+    <!-- 召唤入口：扭蛋机投币口 -->
+    <div id="stage-start">
+      <div class="gacha-console" id="gacha-console">
+        <div class="coin-slot"><span class="coin"></span></div>
+        <button id="btn-summon">召唤今日OC</button>
+      </div>
+    </div>
+
+    <!-- 动画主舞台 -->
+    <main id="stage"></main>
+  </div>
+
+  <!-- 结果卡：弹出浮窗 -->
+  <div id="result-mask" class="hidden">
+    <div id="result-card">
+      <button id="btn-result-close" class="rc-close">✕</button>
+      <div class="rc-head">
+        <h2>今日 OC</h2>
+        <div class="rc-actions">
+          <button id="btn-reroll-all" class="ghost">整体重摇</button>
+          <button id="btn-pool" class="ghost">待发展池</button>
+          <button id="btn-fav" class="fav" title="收藏">♡</button>
+        </div>
+      </div>
+      <div id="result-list"></div>
+    </div>
+  </div>
+
+  <!-- 待发展池 -->
+  <div id="pool-mask" class="hidden">
+    <div id="pool-panel">
+      <h3>待发展池</h3>
+      <ul id="pool-list"></ul>
+      <button id="btn-pool-close">关闭</button>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden"></div>
+
+  <script src="src/data.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>
