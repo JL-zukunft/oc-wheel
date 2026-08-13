@@ -519,6 +519,5 @@ body::after {
   /* 结果卡 */
   #result-card { padding: 16px; }
   .rc-cta { font-size: 24px; letter-spacing: 3px; }
-  .rc-head { flex-direction: column; align-items: flex-start; gap: 10px; padding-right: 0; }
   .rc-chip { font-size: 15px; }
 }
